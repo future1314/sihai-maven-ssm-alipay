@@ -8,6 +8,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.n3r.idworker.Sid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,7 +93,7 @@ public class AlipayController {
 
 	/**
 	 *
-	 * @param productId
+	 * @param
 	 * @return
 	 * @throws Exception
 	 */
@@ -107,11 +109,12 @@ public class AlipayController {
 		order.setOrderAmount(String.valueOf(Float.valueOf(p.getPrice()) * order.getBuyCounts()));
 		order.setOrderStatus(OrderStatusEnum.WAIT_PAY.key);
 		orderService.saveOrder(order);
+		//int save=orderService.saveOrder(order);
 
 		ModelAndView mv = new ModelAndView("goPay");
 		mv.addObject("order", order);
 		mv.addObject("p", p);
-
+		log.info("2 -- createOrder ={}",JSONObject.toJSONString(mv));
 		return mv;
 	}
 
@@ -135,7 +138,7 @@ public class AlipayController {
 		order.setOrderAmount(String.valueOf(Float.valueOf(p.getPrice()) * order.getBuyCounts()));
 		order.setOrderStatus(OrderStatusEnum.WAIT_PAY.key);
 		orderService.saveOrder(order);
-
+        log.info("createOrder ={}",JSONObject.toJSONString(LeeJSONResult.ok(orderId)));
 		return LeeJSONResult.ok(orderId);
 	}
 
@@ -195,7 +198,7 @@ public class AlipayController {
 		//订单名称，必填
 		String subject = product.getName();
 		//商品描述，可空
-		String body = "用户订购商品个数：" + order.getBuyCounts();
+		String body = "buy total:" + order.getBuyCounts();
 
 		// 该笔订单允许的最晚付款时间，逾期将关闭交易。取值范围：1m～15d。m-分钟，h-小时，d-天，1c-当天（1c-当天的情况下，无论交易何时创建，都在0点关闭）。 该参数数值不接受小数点， 如 1.5h，可转换为 90m。
     	String timeout_express = "1c";
@@ -209,7 +212,8 @@ public class AlipayController {
 
 		//请求
 		String result = alipayClient.pageExecute(alipayRequest).getBody();
-
+		//log.info("alipay result={}",JSONObject.toJSONString(request));//报错
+		log.info("alipay result={}",request);
 		return result;
 	}
 
